@@ -32,8 +32,9 @@ class MainActivity : ComponentActivity() {
             val activity = this
             setContent {
                 KampusGoTheme {
-// Holds the typed text while this screen is open. A redraw keeps it. Rotation still runs onCreate again.
+                    // Holds the typed text while this screen is open. A redraw keeps it. Rotation still runs onCreate again.
                     var name by remember { mutableStateOf("") }
+                    var npm by remember { mutableStateOf("") }
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                         Column(
                             modifier = Modifier
@@ -41,18 +42,24 @@ class MainActivity : ComponentActivity() {
                                 .padding(24.dp)
                         ) {
                             Text(text = "KampusGo")
-// Screen 1 input. "name" here is the text, not the Intent extra yet.
+                            // Screen 1 input. "name" here is the text, not the Intent extra yet.
                             OutlinedTextField(
                                 value = name,
                                 onValueChange = { name = it },
                                 label = { Text("Your name") }
                             )
+                            OutlinedTextField(
+                                value = npm,
+                                onValueChange = { npm = it },
+                                label = { Text("Your npm-nr.") }
+                            )
                             Button(onClick = {
-// Explicit Intent: open ProfileActivity, which is our own screen.
+                                // Explicit Intent: open ProfileActivity, which is our own screen.
                                 val intent = Intent(activity, ProfileActivity::class.java)
-// Attach the typed name under the label "name". Screen 2 reads that same label.
+                                // Attach the typed name under the label "name". Screen 2 reads that same label.
                                 intent.putExtra("name", name)
-// Ask Android to create screen 2 and show it.
+                                intent.putExtra("npm", npm)
+                                // Ask Android to create screen 2 and show it.
                                 activity.startActivity(intent)
                             }) {
                                 Text("Open profile")
