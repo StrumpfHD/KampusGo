@@ -28,21 +28,23 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            // Capture the Activity BEFORE setContent. The button needs it to build an Intent.
             val activity = this
             setContent {
                 KampusGoTheme {
-                    // Holds the typed text while this screen is open. A redraw keeps it. Rotation still runs onCreate again.
+
                     var name by remember { mutableStateOf("") }
                     var npm by remember { mutableStateOf("") }
+                    var showEmpty by remember { mutableStateOf(false) }
+                    val events = if (showEmpty) emptyList() else sampleEvents
+
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                         Column(
                             modifier = Modifier
                                 .padding(innerPadding)
                                 .padding(24.dp)
+                                .fillMaxSize()
                         ) {
                             Text(text = "KampusGo")
-                            // Screen 1 input. "name" here is the text, not the Intent extra yet.
                             OutlinedTextField(
                                 value = name,
                                 onValueChange = { name = it },
@@ -54,12 +56,9 @@ class MainActivity : ComponentActivity() {
                                 label = { Text("Your npm-nr.") }
                             )
                             Button(onClick = {
-                                // Explicit Intent: open ProfileActivity, which is our own screen.
                                 val intent = Intent(activity, ProfileActivity::class.java)
-                                // Attach the typed name under the label "name". Screen 2 reads that same label.
                                 intent.putExtra("name", name)
                                 intent.putExtra("npm", npm)
-                                // Ask Android to create screen 2 and show it.
                                 activity.startActivity(intent)
                             }) {
                                 Text("Open profile")
@@ -71,6 +70,21 @@ class MainActivity : ComponentActivity() {
                                 activity.startActivity(intent)
                             }) {
                                 Text("XML form")
+                            }
+
+                            EventList(
+                                events = events,
+                                onEventClick = { id ->
+                                    // Explicit Intent: open the detail screen and pass the event id.
+                                    val intent = Intent(activity, EventDetailActivity::class.java)
+                                    intent.putExtra("id", id)
+                                    activity.startActivity(intent)
+                                },
+                                modifier = Modifier.weight(1f),
+                            )
+
+                            Button(onClick = { showEmpty = !showEmpty }) {
+                                Text(if (showEmpty) "Show events" else "Show empty")
                             }
                         }
                     }
